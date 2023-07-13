@@ -1,5 +1,5 @@
 import pandas as pd
-from dash import html, dcc, Dash, Input, Output, State, callback, register_page
+from dash import html, dcc, Dash, Input, Output, State, callback, register_page, ALL
 import dash
 import plotly.express as px
 import plotly.graph_objects as go
@@ -19,9 +19,9 @@ app = Dash (
 options_in_navbar = dbc.Row (children = [
                 dbc.Col (children = [
                     dbc.Nav (children = [
-                            dbc.NavItem (dbc.NavLink ('SDG Information', active = True, href = '/')),
-                            dbc.NavItem (dbc.NavLink ('SDG-Focused Tab', href = '/sdg-focused-tab')), 
-                            dbc.NavItem (dbc.NavLink ('Region-Focused Tab', href = '/region-focused-tab')),   
+                            dbc.NavItem (dbc.NavLink ('SDG Information', id = {'type' : 'link-navbar', 'index' : 'sdg-info'}, href = '/')),
+                            dbc.NavItem (dbc.NavLink ('SDG-Focused Tab', id = {'type' : 'link-navbar', 'index' : 'sdg-focused-tab'}, href = '/sdg-focused-tab')), 
+                            dbc.NavItem (dbc.NavLink ('Region-Focused Tab', id = {'type' : 'link-navbar', 'index' : 'region-focused-tab'}, href = '/region-focused-tab')),   
                         ],
                         navbar = True,
                         pills = True,
@@ -74,6 +74,7 @@ navbar = dbc.Navbar (children = [
 
 app.layout = dbc.Container(id = 'main-container',
                            children = [
+                               dcc.Location(id="url"),
                                navbar, 
                                dash.page_container
                             ],
@@ -96,6 +97,22 @@ def toggle_navbar_collapse(n, is_open):
     if n:
         return not is_open
     return is_open
+
+@callback(
+        Output({"type":"link-navbar", "index": ALL}, "className"), 
+        [Input("url", "pathname"), 
+         Input({"type":"link-navbar", "index": ALL}, "id")]
+)
+def callback_func(pathname, link_elements):
+    pathname = pathname [1:]
+    temp_list = ["nav-active" if val["index"] == pathname else "nav-not-active" for val in link_elements]
+
+    if 'nav-active' not in temp_list:
+        temp_list [0] = 'nav-active'
+
+    print (temp_list, ' ', pathname)
+    return temp_list
+
 
 if __name__ == '__main__':
     app.run_server (debug = True)
