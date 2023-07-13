@@ -11,10 +11,6 @@ register_page (
     path = '/sdg-focused-tab'
 )
 
-layout = html.Div([
-        html.H1(
-            [
-                "Page 2"
-            ]
-        )
-    ])
+layout = dbc.Container (children = [
+    
+])

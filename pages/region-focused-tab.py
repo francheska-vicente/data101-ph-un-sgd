@@ -10,3 +10,7 @@ register_page (
     name = 'Region-focused Tab',
     path = '/region-focused-tab'
 )
+
+layout = dbc.Container (children = [
+    
+])
