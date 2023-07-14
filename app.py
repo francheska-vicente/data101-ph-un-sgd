@@ -110,7 +110,6 @@ def callback_func(pathname, link_elements):
     if 'nav-active' not in temp_list:
         temp_list [0] = 'nav-active'
 
-    print (temp_list, ' ', pathname)
     return temp_list
 
 

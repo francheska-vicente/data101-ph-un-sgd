@@ -37,7 +37,7 @@ p {
 
 #chart-container {
     max-width : 100%;
-    padding : 8%;
+    padding : 6%;
 }
 
 .count-sdg {
@@ -73,7 +73,12 @@ p {
     font-family: 'Source Serif 4', serif;
 }
 
-.card:hover {
+.card-sdg:hover {
     background-color: #9e4560;
     color: #FFFFFF;
+}
+
+.card {
+    margin : auto;
+    padding : 0;
 }

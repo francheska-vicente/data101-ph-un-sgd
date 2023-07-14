@@ -66,7 +66,7 @@ card = dbc.Card(
         ]
     ),
     style={"width": "18rem"},
-    className = 'card',
+    className = 'card-sdg',
 )
 
 goals_info = dbc.Row (children = [
