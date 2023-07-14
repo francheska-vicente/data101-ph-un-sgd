@@ -13,48 +13,62 @@ register_page (
 
 sdg_info_df = pd.read_csv ('./data/sdg_info_fixed.csv')
 
-sdg_stats = dbc.Row (children = [
-    dbc.Col (children = [
-        dbc.Row (children = [
-            html.H1 ('17', className = 'count-sdg')
-        ]),
-        dbc.Row (children = [
-             html.H3 ('Goals', className = 'count-text-sdg')
-        ]),
-    ], class_name = 'col-4'),
-    dbc.Col (children = [
-        dbc.Row (children = [
-            html.H1 ('169', className = 'count-sdg')
-        ]),
-        dbc.Row (children = [
-            html.H3 ('Targets', className = 'count-text-sdg')
-        ]),
-    ], class_name = 'col-4'),
-    dbc.Col (children = [
-        dbc.Row (children = [
-            html.H1 ('7', className = 'count-sdg')
-        ]),
-        dbc.Row (children = [
-            html.H3 ('Years Left until 2030', className = 'count-text-sdg')
-        ]),
-    ], class_name = 'col-4')
-])
+sdg_stats = dbc.Container (children = [
+    dbc.Row (children = [
+        dbc.Col (children = [
+            dbc.Row (children = [
+                html.H1 ('17', className = 'count-sdg')
+            ]),
+            dbc.Row (children = [
+                html.H3 ('Goals', className = 'count-text-sdg')
+            ]),
+        ], class_name = 'col-4'),
+        dbc.Col (children = [
+            dbc.Row (children = [
+                html.H1 ('169', className = 'count-sdg')
+            ]),
+            dbc.Row (children = [
+                html.H3 ('Targets', className = 'count-text-sdg')
+            ]),
+        ], class_name = 'col-4'),
+        dbc.Col (children = [
+            dbc.Row (children = [
+                html.H1 ('7', className = 'count-sdg')
+            ]),
+            dbc.Row (children = [
+                html.H3 ('Years Left until 2030', className = 'count-text-sdg')
+            ]),
+        ], class_name = 'col-4')
+    ])
+], class_name = 'min-vh-100 p-5 d-flex justify-content-around align-items-center second-container',
+style = {
+    'background-image' : 'url ("/assets/bg.jpg")',
+    'background-size' : 'cover',
+    'height' : '100%'
+})
 
-sdg_info = dbc.Row (children = [
-    dbc.Col (children = [
-        html.H1 ('The United Nations\' Sustainable Development Goals', id = 'title'),
-        html.P ('In 2015, the Sustainable Development Goals (SDGs) were established by the United Nations General Assembly. These 17 interconnected global objectives were set with the aim of being accomplished by 2030, with the vision of creating a more sustainable and improved future for everyone.',
-                className = 'description')
-    ], className = 'col-7'),
-    dbc.Col (children = [], className = 'col-1'),
-    dbc.Col (children = [
-        html.Img (src = dash.get_asset_url ('sdg_logo.png'),
-                  style = {
-                      'max-width' : '100%'
-                      }
-                )
-    ], className = 'col-4'),
-])
+sdg_info = dbc.Container (children = [
+    dbc.Row (children = [
+        dbc.Col (children = [
+            html.H1 ('The United Nations\' Sustainable Development Goals', id = 'title'),
+            html.P ('In 2015, the Sustainable Development Goals (SDGs) were established by the United Nations General Assembly. These 17 interconnected global objectives were set with the aim of being accomplished by 2030, with the vision of creating a more sustainable and improved future for everyone.',
+                    className = 'description')
+        ], className = 'col-7'),
+        dbc.Col (children = [], className = 'col-1'),
+        dbc.Col (children = [
+            html.Img (src = dash.get_asset_url ('sdg_logo.png'),
+                    style = {
+                        'max-width' : '100%'
+                        }
+                    ),
+            html.Img (src = dash.get_asset_url ('bg.jpg'),
+                    style = {
+                        'max-width' : '0%'
+                        }
+                    )
+        ], className = 'col-4'),
+    ])
+], class_name = 'min-vh-100 p-5')
 
 card = dbc.Card(
     dbc.CardBody(
@@ -69,31 +83,33 @@ card = dbc.Card(
     className = 'card-sdg',
 )
 
-goals_info = dbc.Row (children = [
-    html.H1 ('The 17 Goals', className = 'sub-title'),
+goals_info = dbc.Container (children = [
     dbc.Row (children = [
-        dbc.Col (children = [
-            dbc.Container (children = [
-                card
-            ])
-        ], className = 'col-2'),
-        dbc.Col (children = [
+        html.H1 ('The 17 Goals', className = 'sub-title'),
+        dbc.Row (children = [
+            dbc.Col (children = [
+                dbc.Container (children = [
+                    card
+                ])
+            ], className = 'col-2'),
+            dbc.Col (children = [
 
-        ], className = 'col-2'),
-        dbc.Col (children = [
+            ], className = 'col-2'),
+            dbc.Col (children = [
 
-        ], className = 'col-2'),
-        dbc.Col (children = [
+            ], className = 'col-2'),
+            dbc.Col (children = [
 
-        ], className = 'col-2'),
-        dbc.Col (children = [
+            ], className = 'col-2'),
+            dbc.Col (children = [
 
-        ], className = 'col-2'),
-        dbc.Col (children = [
+            ], className = 'col-2'),
+            dbc.Col (children = [
 
-        ], className = 'col-2')
+            ], className = 'col-2')
+        ])
     ])
-])
+], class_name = 'min-vh-100 p-5')
 
 layout = dbc.Container(id = 'main-container',
                            children = [
