@@ -4,6 +4,8 @@ import dash
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
+import dash_mantine_components as dmc
+from dash_iconify import DashIconify
 
 EXTERNAL_BOOTSTRAP = 'https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/lumen/bootstrap.min.css'
 
@@ -16,56 +18,39 @@ app = Dash (
     use_pages = True
 )
 
-options_in_navbar = dbc.Row (children = [
-                dbc.Col (children = [
-                    dbc.Nav (children = [
+options_in_navbar = dbc.Nav (children = [
                             dbc.NavItem (dbc.NavLink ('SDG Information', id = {'type' : 'link-navbar', 'index' : 'sdg-info'}, href = '/')),
                             dbc.NavItem (dbc.NavLink ('SDG-Focused Tab', id = {'type' : 'link-navbar', 'index' : 'sdg-focused-tab'}, href = '/sdg-focused-tab')), 
                             dbc.NavItem (dbc.NavLink ('Region-Focused Tab', id = {'type' : 'link-navbar', 'index' : 'region-focused-tab'}, href = '/region-focused-tab')),   
                         ],
                         navbar = True,
                         pills = True,
-                        fill = True
+                        fill = True,
+                        justified = True,
+                        className = "me-2"
                     )
-                ])
-            ]),
 
-navbar = dbc.Navbar (children = [
+navbar = dbc.Navbar(
+    children = [
+        # Icon source: https://www.flaticon.com/free-icon/growth_2889137
         dbc.Container (children = [
-            dbc.Row (children = [
-                dbc.Col (children = [
-                    # Icon source: https://www.flaticon.com/free-icon/growth_2889137
-                    dbc.Container (children = [
-                        html.Img(src=dash.get_asset_url('growth_white.png'), height="40px"),
-                        dbc.NavbarBrand ("The Progress of the Philippines in the SDG", 
-                                            className = "ms-2 h-50",
-                                            style = {
-                                                'font-weight' : 'bold',
-                                                'height' : '100%',
-                                                'vertical-align' : 'middle'
-                                            },
-                                        ), 
-                        ],
-                        )
-                    ])
-                ], 
-                align = 'center',
-                className="g-0"
-            ),
-            dbc.NavbarToggler (id = "navbar-toggler", n_clicks = 0),
-            dbc.Collapse(
+            html.Img(src=dash.get_asset_url('growth.png'), height="24px", className = "ms-2"),
+            dbc.NavbarBrand ("The Progress of the Philippines in the SDG", 
+                                className = "ms-2 h-100 me-auto",
+                                style = {
+                                    'font-weight' : 'bold',
+                                    'vertical-align' : 'middle'
+                                },
+                            ), 
+        ]),
+        dbc.NavbarToggler (id = "navbar-toggler", n_clicks = 0),
+        dbc.Collapse (
                 options_in_navbar,
                 id = "navbar-collapse",
                 is_open = False,
                 navbar = True,
-            ),
-        ],
-        style = {
-            'padding-left' : '1%',
-            'margin-left' : '0%',
-            'padding-top' : '5px',
-            'padding-bottom' : '5px'
-        }) 
+                className = "ms-auto"
+        ),
     ],
     color = 'primary',
     dark = True,
@@ -82,8 +67,6 @@ app.layout = dbc.Container(id = 'main-container',
                                 'margin-right': '0 !important',
                                 'max-width': '100%',
                                 'padding' : '0px',
-                                'width' : '100vw',
-                                'height' : '100vh'
                             }, 
 )
 

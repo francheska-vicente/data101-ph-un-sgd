@@ -4,6 +4,8 @@ import dash
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
+import dash_mantine_components as dmc
+from dash_iconify import DashIconify
 
 register_page (
     __name__, 
@@ -22,7 +24,7 @@ control_card = dbc.Row (children = [
                 dbc.Row (children = [
                     dbc.Col (children = [
                         dbc.Row (children = [
-                            html.H5 ('What are the regions you want to visualize? (Maximum of 2)'),
+                            html.H6 ('What are the regions you want to visualize? (Maximum of 2)'),
                             dcc.Dropdown(
                                 id = 'region-dropdown',
                                 options = [{'label': i, 'value': i} for i in sdg_regions_available],
@@ -33,7 +35,7 @@ control_card = dbc.Row (children = [
                     ], className = 'col-6'),
                     dbc.Col (children = [
                         dbc.Row (children = [
-                            html.H5 ('What are the indicators you want to visualize? (Maximum of 2)'),
+                            html.H6 ('What are the indicators you want to visualize? (Maximum of 2)'),
                             dcc.Dropdown(
                                 id = 'indicator-dropdown',
                                 options = [{'label': i, 'value': i} for i in sdg_indicators_available],
@@ -53,12 +55,17 @@ control_card = dbc.Row (children = [
 )
 
 layout = dbc.Container (children = [
-    control_card
-],
-style = {
-    'margin' : '1%',
-    'min-width' : '98%'
-})
+        html.H2("SGD-Focused Tab"),
+        html.P("Choose regions and indicators to display ganito ganito.", className = "pb-3 text-center fw-light fst-italic"),
+        control_card
+    ],
+    className = 'p-5',
+    style = {
+        'background-image' : 'linear-gradient(to bottom,rgba(255, 255, 255, 1.0),rgba(255, 255, 255, 0)), url("/assets/bg2.jpg")',
+        'background-size' : 'cover',
+        'height' : 'calc(100vh - 54px)',
+        'min-width' : '100vw'
+    })
 
 @callback (
     Output ('region-dropdown', 'options'),
@@ -76,9 +83,11 @@ def region_dropdown_control (region_selected):
     if len (region_selected) >= 2:
         input_warning = html.P (id = 'region-warning-message', 
                                 children = 'Maximum number of regions reached!',
+                                className = "fw-light fst-italic",
                                 style = {
                                     'text-align' : 'right',
-                                    'margin-bottom' : '0px'
+                                    'margin-bottom' : '0px',
+                                    'font-size' : '14px'
                                 })
         options = [
             {
@@ -106,9 +115,11 @@ def indicator_dropdown_control (indicator_selected):
     if len (indicator_selected) >= 2:
         input_warning = html.P (id = 'indicator-warning-message', 
                                 children = 'Maximum number of indicators reached!',
+                                className = "fw-light fst-italic",
                                 style = {
                                     'text-align' : 'right',
-                                    'margin-bottom' : '0px'
+                                    'margin-bottom' : '0px',
+                                    'font-size' : '14px'
                                 })
         options = [
             {
