@@ -67,6 +67,7 @@ app.layout = dbc.Container(id = 'main-container',
                                 'margin-right': '0 !important',
                                 'max-width': '100%',
                                 'padding' : '0px',
+                                'height' : '100vh'
                             }, 
 )
 
