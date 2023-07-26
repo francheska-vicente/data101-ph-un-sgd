@@ -118,10 +118,10 @@ layout = dbc.Container (children = [
 def select_value(value):
     return "Select at least one target." if len(value) < 1 else ""
 
-@callback(Output("heatmap", "figure"), Input("target-dropdown", "value"))
-def filter_heatmap():
-    fig = px.imshow(None)
-    return fig
+# @callback(Output("heatmap", "figure"), Input("target-dropdown", "value"))
+# def filter_heatmap():
+#     fig = px.imshow(None)
+#     return fig
 
 @callback(Output("info-accordion", "children"), Input("target-dropdown", "value"))
 def update_accordion(targets):
