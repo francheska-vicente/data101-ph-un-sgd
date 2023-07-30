@@ -13,7 +13,7 @@ register_page (
     path = '/'
 )
 
-sdg_info_df = pd.read_csv ('./data/sdg_info_fixedv1.csv')
+sdg_info_df = pd.read_csv ('./data/sdg_info_fixed.csv')
 
 sdg_stats = dbc.Container (children = [
     dbc.Row (children = [
