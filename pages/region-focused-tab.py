@@ -12,7 +12,7 @@ register_page (
     path = '/region-focused-tab'
 )
 
-sdg_targets_df = pd.read_csv ('data/sdg_info_fixed.csv')
+sdg_targets_df = pd.read_csv ('data/sdg_info_fixedv1.csv')
 sdg_targets_df = sdg_targets_df ['Target'].unique ()
 
 control_card = dbc.Card (children = [
