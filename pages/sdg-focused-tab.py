@@ -214,7 +214,6 @@ def generate_barchart(regions_selected, indicator, selected_year, is_ascending):
         plot_bgcolor="light grey",
     )
 
-    fig.update_xaxes(type="category")
 
     fig.update_layout(
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
