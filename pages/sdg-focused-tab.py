@@ -1,22 +1,17 @@
 import pandas as pd
-from dash import html, dcc, Dash, Input, Output, State, callback, register_page
+from dash import html, dcc, Input, Output, callback, register_page, callback_context
 import dash
 import plotly.express as px
-import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
-from dash_iconify import DashIconify
+
+from data import *
+from constants import *
 
 register_page(__name__, name="SDG-focused Tab", path="/sdg-focused-tab")
 
-sdg_data = pd.read_csv(
-    "https://raw.githubusercontent.com/francheska-vicente/datapre-project/main_v2/data_output/combined_data.csv"
-)
-sdg_regions_available = sdg_data["Geolocation"].unique()[1:]
-sdg_indicators_available = sdg_data.columns[2:]
-
-linechart_desc_default = "Choose an indicator to track its progress over the years."
-barchart_desc_default = "Choose an indicator to compare its progress between all regions for the latest year."
+barchart1_is_ascending = False
+barchart2_is_ascending = False
 
 
 def generate_linechart(regions_selected, indicator):
@@ -26,14 +21,9 @@ def generate_linechart(regions_selected, indicator):
         regions_selected.append("PHILIPPINES")
 
     for region in regions_selected:
-        if len(indicator) > 1:
-            temp_region = sdg_data[sdg_data["Geolocation"] == region][
-                ["Year", indicator[0], indicator[1]]
-            ]
-        else:
-            temp_region = sdg_data[sdg_data["Geolocation"] == region][
-                ["Year", indicator[0]]
-            ]
+        temp_region = sdg_data[sdg_data["Geolocation"] == region][
+            ["Year", indicator[0]]
+        ]
 
         temp_region = pd.concat([sdg_data["Geolocation"], temp_region], axis=1)
 
@@ -48,6 +38,25 @@ def generate_linechart(regions_selected, indicator):
     df_visualization = two_region[["Geolocation", "Year", indicator]]
     df_visualization = df_visualization.dropna()
 
+    x = 0
+    while indicator != sdg_score.iloc[x]["Indicator"]:
+        x = x + 1
+
+    y = 0
+    while y < len(df_visualization["Year"].unique()):
+        target = " ".join(indicator.split(" ")[1:])
+        new_row = {
+            "Geolocation": "Target " + target,
+            indicator: sdg_score.iloc[x]["Target"],
+            "Year": df_visualization["Year"].unique()[y],
+        }
+
+        temp_row = pd.DataFrame(new_row, index=[0])
+        df_visualization = pd.concat([df_visualization, temp_row]).reset_index(
+            drop=True
+        )
+        y = y + 1
+
     fig = px.line(
         df_visualization,
         x="Year",
@@ -56,13 +65,7 @@ def generate_linechart(regions_selected, indicator):
         labels={indicator: label},
         color="Geolocation",
     )
-    title = " ".join(indicator.split(" ")[1:]) + " per Year"
     fig.update_layout(
-        # TITLE
-        title={"text": title, "y": 0.95, "x": 0.5},
-        title_font_family="Cambria",
-        title_font_color="#000000",
-        title_font_size=20,
         # axis and legend font
         font_family="Cambria",
         font_color="#000000",
@@ -104,19 +107,20 @@ def generate_linechart(regions_selected, indicator):
 
     fig.update_xaxes(type="category")
 
+    fig.update_layout(
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    )
+
     return fig
 
 
-def generate_barchart(regions_selected, indicator):
+def generate_barchart(regions_selected, indicator, selected_year, is_ascending):
     two_region = pd.DataFrame()
 
     if len(regions_selected) == 0:
         regions_selected.append("PHILIPPINES")
 
-    if len(indicator) > 1:
-        temp_region = sdg_data[["Year", indicator[0], indicator[1]]]
-    else:
-        temp_region = sdg_data[["Year", indicator[0]]]
+    temp_region = sdg_data[["Year", indicator[0]]]
 
     temp_region = pd.concat([sdg_data["Geolocation"], temp_region], axis=1)
     temp_region = temp_region[temp_region["Geolocation"] != "PHILIPPINES"]
@@ -139,25 +143,28 @@ def generate_barchart(regions_selected, indicator):
 
     year_values = df_visualization["Year"].unique()
 
+    if selected_year == None:
+        selected_year = year_values[-1]
+
     df_visualization_curr = df_visualization[
-        df_visualization["Year"] == year_values[-1]
+        df_visualization["Year"] == int(selected_year)
     ]
+
     df_visualization_curr = df_visualization_curr.drop_duplicates()
+    regions_list = []
+
+    for temp in df_visualization_curr["Geolocation"]:
+        regions_list.append(temp.split(":")[0])
+
     fig = px.bar(
         df_visualization_curr,
         x=indicator,
-        y=geolocation_values,
+        y=regions_list,
         labels={indicator: label},
-        color="Geolocation",
+        color=regions_list,
     )
-    title = " ".join(indicator.split(" ")[1:]) + " of the Year " + str(year_values[-1])
 
     fig.update_layout(
-        # TITLE
-        title={"text": title, "y": 0.95, "x": 0.5},
-        title_font_family="Cambria",
-        title_font_color="#000000",
-        title_font_size=20,
         # axis font
         font_family="Cambria",
         font_color="#000000",
@@ -179,7 +186,11 @@ def generate_barchart(regions_selected, indicator):
         # y-axis
         yaxis_title="Geolocation",
         yaxis=dict(
-            {"categoryorder": "total ascending"},  # ascending values from bottom to top
+            {
+                "categoryorder": "total ascending"
+                if is_ascending
+                else "total descending"
+            },
             showgrid=False,
             showline=True,
             showticklabels=True,
@@ -197,9 +208,21 @@ def generate_barchart(regions_selected, indicator):
         plot_bgcolor="light grey",
     )
 
-    fig.update_xaxes(type="category")
+    fig.update_layout(
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    )
 
     return fig
+
+
+def get_latest_year(indicator):
+    temp_region = sdg_data[["Geolocation", "Year", indicator]]
+    temp_region = temp_region[temp_region["Geolocation"] != "PHILIPPINES"]
+    temp_region = temp_region.dropna(thresh=len([indicator]) + 1)
+    temp_region["Year"] = temp_region["Year"].astype("int")
+    temp_region = temp_region.dropna()
+    year_values = temp_region["Year"].unique()
+    return year_values[-1]
 
 
 control_card = dbc.Card(
@@ -275,11 +298,54 @@ control_card = dbc.Card(
 
 
 def create_info_label(item):
-    return dmc.AccordionControl(item)
+    return dmc.AccordionControl(item, className="text-body fw-bold")
 
 
 def create_info_item(info):
-    return dmc.AccordionPanel(dmc.Text(info, size="sm"))
+    children = []
+    for i in range(len(info)):
+        if i == 1:
+            children.append(
+                html.Img(src=dash.get_asset_url(info[0]), className="w-100 mb-2")
+            )
+        elif i == 0:
+            children.append(dmc.Text(info[1], className="text-body", size="sm"))
+            children.append(html.Br())
+        else:
+            children.append(dmc.Text(info[i], className="text-body", size="sm"))
+            children.append(html.Br())
+    return dmc.AccordionPanel(children, className="flex")
+
+
+def retrieve_region_info(region):
+    info = []
+    info.append(
+        "region-images/"
+        + region_images[list(region_info["Region"].unique()).index(region)]
+    )
+
+    region_information = list(
+        region_info[region_info["Region"] == region]["Description"].values
+    )
+    for region_infor in region_information:
+        info.append(region_infor)
+    return info
+
+
+def retrieve_indicator_info(indicator):
+    goal_num = int(indicator.split(".")[0])
+    target_num = indicator.split(" ")[0][slice(4)]
+    goal_name = list(
+        sdg_info[sdg_info["Target Number"] == target_num][["Main SDG"]].values
+    )[0]
+
+    info = []
+    info.append("goal-images/" + str(goal_num) + ".png")
+    info.append("This indicator is under the goal of " + goal_name + ".")
+    for goal_info in goals_information[goal_num - 1]:
+        info.append(goal_info)
+
+    return info
 
 
 region_info_card = dbc.Card(
@@ -303,6 +369,7 @@ region_info_card = dbc.Card(
         ),
     ],
     className="mt-3 flex justify-content-center align-items-center",
+    id="region_info_card",
 )
 
 indicator_info_card = dbc.Card(
@@ -326,6 +393,7 @@ indicator_info_card = dbc.Card(
         ),
     ],
     className="mt-3 flex justify-content-center align-items-center",
+    id="indicator_info_card",
 )
 
 choropleth_card = dbc.Card(
@@ -345,13 +413,13 @@ choropleth_card = dbc.Card(
 
 linechart1_card = dbc.Card(
     children=[
-        dbc.CardHeader("Line Chart", className="w-100"),
+        dbc.CardHeader("Line Chart", id="linechart1_title", className="w-100"),
         dbc.CardBody(
             children=[
                 dcc.Graph(figure=px.line(), id="linechart1"),
                 dmc.Divider(variant="dotted", className="p-2"),
                 html.H6(
-                    linechart_desc_default,
+                    sdg_linechart_desc_default,
                     className="text-center",
                     id="linechart1_desc",
                 ),
@@ -362,41 +430,35 @@ linechart1_card = dbc.Card(
     className="mt-3 flex justify-content-center align-items-center",
 )
 
-
-def generate_linechart2card(regions, indicator):
-    return dbc.Card(
-        children=[
-            dbc.CardHeader("Line Chart", className="w-100"),
-            dbc.CardBody(
-                children=[
-                    dcc.Graph(
-                        figure=generate_linechart(regions, indicator), id="linechart2"
-                    ),
-                    dmc.Divider(variant="dotted", className="p-2"),
-                    html.H6(
-                        "[Short description of results here.]",
-                        className="text-center",
-                        id="linechart2_desc",
-                    ),
-                ],
-                className="w-100",
-            ),
-        ],
-        className="mt-3 flex justify-content-center align-items-center",
-    )
-
-
-linechart2_card = html.Div(id="linechart2_card")
+linechart2_card = dbc.Card(
+    children=[
+        dbc.CardHeader("Line Chart", id="linechart2_title", className="w-100"),
+        dbc.CardBody(
+            children=[
+                dcc.Graph(figure=px.line(), id="linechart2"),
+                dmc.Divider(variant="dotted", className="p-2"),
+                html.H6(
+                    sdg_linechart_desc_default,
+                    className="text-center",
+                    id="linechart2_desc",
+                ),
+            ],
+            className="w-100",
+        ),
+    ],
+    className="hidden mt-3 flex justify-content-center align-items-center",
+    id="linechart2_card",
+)
 
 barchart1_card = dbc.Card(
     children=[
-        dbc.CardHeader("Bar Chart", className="w-100"),
+        dbc.CardHeader("Bar Chart", id="barchart1_title", className="w-100"),
         dbc.CardBody(
             children=[
                 dcc.Graph(figure=px.bar(), id="barchart1"),
                 dmc.Divider(variant="dotted", className="p-2"),
                 html.H6(
-                    barchart_desc_default,
+                    sdg_barchart_desc_default,
                     className="text-center",
                     id="barchart1_desc",
                 ),
@@ -407,31 +469,25 @@ barchart1_card = dbc.Card(
     className="mt-3 flex justify-content-center align-items-center",
 )
 
-
-def generate_barchart2card(regions, indicator):
-    return dbc.Card(
-        children=[
-            dbc.CardHeader("Bar Chart", className="w-100"),
-            dbc.CardBody(
-                children=[
-                    dcc.Graph(
-                        figure=generate_barchart(regions, indicator), id="barchart2"
-                    ),
-                    dmc.Divider(variant="dotted", className="p-2"),
-                    html.H6(
-                        "[Short description of results here.]",
-                        className="text-center",
-                        id="barchart2_desc",
-                    ),
-                ],
-                className="w-100",
-            ),
-        ],
-        className="mt-3 flex justify-content-center align-items-center",
-    )
-
-
-barchart2_card = html.Div(id="barchart2_card")
+barchart2_card = dbc.Card(
+    children=[
+        dbc.CardHeader("Bar Chart", id="barchart2_title", className="w-100"),
+        dbc.CardBody(
+            children=[
+                dcc.Graph(figure=px.bar(), id="barchart2"),
+                dmc.Divider(variant="dotted", className="p-2"),
+                html.H6(
+                    sdg_barchart_desc_default,
+                    className="text-center",
+                    id="barchart2_desc",
+                ),
+            ],
+            className="w-100",
+        ),
+    ],
+    className="mt-3 flex justify-content-center align-items-center",
+    id="barchart2_card",
+)
 
 layout = dbc.Container(
     children=[
@@ -440,16 +496,16 @@ layout = dbc.Container(
         dbc.Row(
             children=[
                 dbc.Col(
-                    children=[region_info_card, choropleth_card], className="col-6 ps-0"
-                ),
-                dbc.Col(
                     children=[
-                        indicator_info_card,
-                        linechart1_card,
-                        linechart2_card,
+                        region_info_card,
+                        choropleth_card,
                         barchart1_card,
                         barchart2_card,
                     ],
+                    className="col-6 ps-0",
+                ),
+                dbc.Col(
+                    children=[indicator_info_card, linechart1_card, linechart2_card],
                     className="col-6 pe-0",
                 ),
             ],
@@ -458,24 +514,37 @@ layout = dbc.Container(
     ],
     className="p-5",
     style={
-        "background-image": 'linear-gradient(to bottom,rgba(255, 255, 255, 1.0),rgba(255, 255, 255, 0)), url("/assets/bg2.jpg")',
+        "background-image": 'linear-gradient(to bottom,rgba(255, 255, 255, 1.0),rgba(255, 255, 255, 0)), url("/assets/background/bg2.jpg")',
         "background-size": "cover",
         "min-width": "100vw",
     },
 )
 
 
-@callback(Output("region-dropdown", "error"), Output("region-info-desc", "children"), Input("region-dropdown", "value"))
+@callback(
+    Output("region-dropdown", "error"),
+    Output("region-info-desc", "children"),
+    Input("region-dropdown", "value"),
+)
 def update_text(region):
     if region == None or len(region) < 1:
         return "Select at least one region.", "Select a region to view their details."
     return "", ""
 
-@callback(Output("indicator-dropdown", "error"), Output("indicator-info-desc", "children"), Input("indicator-dropdown", "value"))
+
+@callback(
+    Output("indicator-dropdown", "error"),
+    Output("indicator-info-desc", "children"),
+    Input("indicator-dropdown", "value"),
+)
 def update_text(indicator):
     if indicator == None or len(indicator) < 1:
-        return "Select at least one indicator.", "Select a indicator to view their details."
+        return (
+            "Select at least one indicator.",
+            "Select a indicator to view their details.",
+        )
     return "", ""
+
 
 @callback(
     Output("region-info-accordion", "children"), Input("region-dropdown", "value")
@@ -488,13 +557,14 @@ def update_accordion(regions):
                 dmc.AccordionItem(
                     [
                         create_info_label(region),
-                        create_info_item("[Short description of the region here.]"),
+                        create_info_item(retrieve_region_info(region)),
                     ],
                     value=region,
                 )
             )
 
     return children
+
 
 @callback(
     Output("indicator-info-accordion", "children"), Input("indicator-dropdown", "value")
@@ -507,7 +577,7 @@ def update_accordion(indicators):
                 dmc.AccordionItem(
                     [
                         create_info_label(indicator),
-                        create_info_item("[Short description of the indicator here.]"),
+                        create_info_item(retrieve_indicator_info(indicator)),
                     ],
                     value=indicator,
                 )
@@ -515,58 +585,122 @@ def update_accordion(indicators):
 
     return children
 
+
 @callback(
     Output("linechart1", "figure"),
+    Output("linechart1_title", "children"),
     Output("barchart1", "figure"),
+    Output("barchart1_title", "children"),
     Output("linechart1_desc", "children"),
     Output("barchart1_desc", "children"),
+    Output("linechart2", "figure"),
+    Output("linechart2_title", "children"),
+    Output("barchart2", "figure"),
+    Output("barchart2_title", "children"),
+    Output("linechart2_desc", "children"),
+    Output("barchart2_desc", "children"),
+    Output("linechart2_card", "style"),
+    Output("barchart2_card", "style"),
     Input("region-dropdown", "value"),
     Input("indicator-dropdown", "value"),
+    Input("linechart1", "clickData"),
+    Input("linechart2", "clickData"),
+    Input("barchart1", "clickData"),
+    Input("barchart2", "clickData"),
 )
-def update_linechart(regions, indicators):
-    if indicators and len(indicators) >= 1:
-        if regions == None:
-            return (
-                generate_linechart([], indicators),
-                generate_barchart([], indicators),
-                "[Short description of results here.]",
-                "[Short description of results here.]",
-            )
-        elif regions and len(regions) < 3:
-            return (
-                generate_linechart(regions, indicators),
-                generate_barchart(regions, indicators),
-                "[Short description of results here.]",
-                "[Short description of results here.]",
-            )
+def update_charts(
+    regions,
+    indicators,
+    linechart1_click,
+    linechart2_click,
+    barchart1_click,
+    barchart2_click,
+):
+    global barchart1_is_ascending, barchart2_is_ascending
+    year = None
+    if linechart1_click != None:
+        year = linechart1_click["points"][0]["x"]
+    if linechart2_click != None:
+        year = linechart2_click["points"][0]["x"]
+
+    if callback_context.triggered[0]["prop_id"] == "barchart1.clickData":
+        barchart1_is_ascending = not barchart1_is_ascending
+    elif callback_context.triggered[0]["prop_id"] == "barchart2.clickData":
+        barchart2_is_ascending = not barchart2_is_ascending
+
+    if regions == None:
+        regions = []
+
+    linechart_info = [
+        sdg_linechart_desc,
+        html.Br(),
+        html.Br(),
+        sdg_linechart_tip,
+    ]
+
+    barchart_info = [
+        sdg_barchart_desc,
+        html.Br(),
+        html.Br(),
+        sdg_barchart_tip,
+    ]
+
+    if indicators != None and len(indicators) == 1:
+        return (
+            generate_linechart(regions, indicators),
+            "Line Chart of the " + " ".join(indicators[0].split(" ")[1:]) + " per Year",
+            generate_barchart(regions, indicators, year, barchart1_is_ascending),
+            "Bar Chart of the "
+            + " ".join(indicators[0].split(" ")[1:])
+            + " of the Year "
+            + (str(get_latest_year(indicators[0])) if year == None else year),
+            linechart_info,
+            barchart_info,
+            px.line(),
+            "Line Chart",
+            px.bar(),
+            "Bar Chart",
+            sdg_linechart_desc_default,
+            sdg_barchart_desc_default,
+            {"display": "none"},
+            {"display": "none"},
+        )
+    elif indicators != None and len(indicators) == 2:
+        return (
+            generate_linechart(regions, [indicators[0]]),
+            "Line Chart of the " + " ".join(indicators[0].split(" ")[1:]) + " per Year",
+            generate_barchart(regions, [indicators[0]], year, barchart1_is_ascending),
+            "Bar Chart of the "
+            + " ".join(indicators[0].split(" ")[1:])
+            + " of the Year "
+            + (str(get_latest_year(indicators[0])) if year == None else year),
+            linechart_info,
+            barchart_info,
+            generate_linechart(regions, [indicators[1]]),
+            "Line Chart of the " + " ".join(indicators[1].split(" ")[1:]) + " per Year",
+            generate_barchart(regions, [indicators[1]], year, barchart2_is_ascending),
+            "Bar Chart of the "
+            + " ".join(indicators[1].split(" ")[1:])
+            + " of the Year "
+            + (str(get_latest_year(indicators[1])) if year == None else year),
+            linechart_info,
+            barchart_info,
+            {"display": "block"},
+            {"display": "block"},
+        )
     return (
         px.line(),
+        "Line Chart",
         px.bar(),
-        linechart_desc_default,
-        barchart_desc_default,
+        "Bar Chart",
+        sdg_linechart_desc_default,
+        sdg_barchart_desc_default,
+        px.line(),
+        "Line Chart",
+        px.bar(),
+        "Bar Chart",
+        sdg_linechart_desc_default,
+        sdg_barchart_desc_default,
+        {"display": "none"},
+        {"display": "none"},
     )
-
-
-@callback(
-    Output("linechart2_card", "children"),
-    Output("barchart2_card", "children"),
-    Input("region-dropdown", "value"),
-    Input("indicator-dropdown", "value"),
-)
-def update_linechart(regions, indicators):
-    if indicators and len(indicators) == 2:
-        if regions == None:
-            return generate_linechart2card([], [indicators[1]]), generate_barchart2card(
-                [], [indicators[1]]
-            )
-        elif regions and len(regions) < 3:
-            return generate_linechart2card(
-                regions, [indicators[1]]
-            ), generate_barchart2card(regions, [indicators[1]])
-    return "", ""
-
-
-
-
-
-
