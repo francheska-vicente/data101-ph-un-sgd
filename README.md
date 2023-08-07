@@ -1,4 +1,4 @@
-# The Philippines’ Sustainable Development Goals (SDGs): A Dashboard
+ # The Philippines’ Sustainable Development Goals (SDGs): A Dashboard
 The Sustainable Development Goals (SDGs) are a set of global objectives established by the United Nations (UN) to address various social, economic, and environmental challenges faced by our world today. These goals were launched in 2015 as a successor to the Millennium Development Goals (MDGs) and provide a holistic framework to achieve sustainable development by the year 2030 (United Nations Development Programme, n.d.).
 
 ### Motivation behind the creation of the dashboard
@@ -11,6 +11,11 @@ Furthermore, interactive visualizations enable policymakers to track progress ov
 
 ## How to set up and run the project locally
 1. Extract the folder from the zipped file that you can download through this DownGit [link](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/francheska-vicente/data101-ph-un-sgd/tree/main).
+2. Launch `Jupyter Notebook` or `Jupyter Lab`.
+3. Navigate to the project folder containing **main.ipynb**. Then, in the **Final** folder, open the **2-Geospatial_v3.ipynb**.
+4. In the **2-Geospatial_v3.ipynb**, click **Restart and Run All**, this would create the geospatial files needed to run the application.
+5. Once the notebook is done executing, open your `Command Prompt` or `Terminal` and navigate it to the folder containing **app.py**.
+6. Run the dashboard using the command **python app.py**.
 
 ## Authors
 - **Demafelix, Christienne Angelo D.**  <br/>
