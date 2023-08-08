@@ -46,7 +46,9 @@ def generate_heatmap(region_selected):
         region_df_corr.mask(mask).dropna(how="all").dropna(axis="columns", how="all")
     )
 
-    fig = px.imshow(df_corr_viz, text_auto=True)
+    fig = px.imshow(df_corr_viz, 
+                    text_auto=True,
+                    color_continuous_scale='PRGn')
     fig.update_layout(
         yaxis=dict(tickfont=dict(size=7)), xaxis=dict(tickfont=dict(size=7))
     )
