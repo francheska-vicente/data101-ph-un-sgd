@@ -159,12 +159,17 @@ def generate_barchart(regions_selected, indicator, selected_year, is_ascending):
     for temp in df_visualization_curr["Geolocation"]:
         regions_list.append(temp.split(":")[0])
 
+    colors_list = ['#17becf', '#636363', '#66c85a', '#d14787', '#584477', '#a6cee3', 
+                   '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', 
+                   '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928']
+
     fig = px.bar(
         df_visualization_curr,
         x=indicator,
         y=regions_list,
         labels={indicator: label},
         color=regions_list,
+        color_discrete_sequence = colors_list
     )
 
     fig.update_layout(
