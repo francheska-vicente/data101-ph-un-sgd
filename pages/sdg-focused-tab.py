@@ -231,6 +231,7 @@ def choropleth_one_indicator (indicators_selected, selected_year):
                           geojson=region.geometry,
                           locations='Geolocation',
                           color=choropleth_data[1],
+                          color_continuous_scale='Aggrnyl_r',
                           center={'lat': 12.099, 'lon': 122.733}, 
                           zoom = 4)
     return fig
