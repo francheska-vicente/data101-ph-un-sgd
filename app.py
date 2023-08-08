@@ -1,16 +1,14 @@
-import pandas as pd
 from dash import html, dcc, Dash, Input, Output, State, callback, register_page, ALL
 import dash
-import plotly.express as px
-import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
-import dash_mantine_components as dmc
-from dash_iconify import DashIconify
+
+from flask import Flask
 
 EXTERNAL_BOOTSTRAP = 'https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/lumen/bootstrap.min.css'
 
+server = Flask(__name__)
 app = Dash (
-    __name__, 
+    server=server, 
     external_stylesheets = [
         EXTERNAL_BOOTSTRAP,
         'https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Source+Serif+4:wght@400;500&display=swap'
@@ -19,7 +17,7 @@ app = Dash (
 )
 
 options_in_navbar = dbc.Nav (children = [
-                            dbc.NavItem (dbc.NavLink ('SDG Information', id = {'type' : 'link-navbar', 'index' : 'sdg-info'}, href = '/')),
+                            dbc.NavItem (dbc.NavLink ('SDG Information', id = {'type' : 'link-navbar', 'index' : ''}, href = '/')),
                             dbc.NavItem (dbc.NavLink ('SDG-Focused Tab', id = {'type' : 'link-navbar', 'index' : 'sdg-focused-tab'}, href = '/sdg-focused-tab')), 
                             dbc.NavItem (dbc.NavLink ('Region-Focused Tab', id = {'type' : 'link-navbar', 'index' : 'region-focused-tab'}, href = '/region-focused-tab')),   
                         ],
@@ -98,7 +96,7 @@ def callback_func(pathname, link_elements):
 
 
 if __name__ == '__main__':
-    app.run_server (debug = True)
+    server.run(host='0.0.0.0', port='8080')
 
 
 register_page (
