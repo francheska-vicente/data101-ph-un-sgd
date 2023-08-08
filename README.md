@@ -30,4 +30,7 @@ Furthermore, interactive visualizations enable policymakers to track progress ov
 - **Demafelix, Christienne Angelo D.**  <br/>
 - **Gozon, Jean Pauline D.**  <br/>
 - **Marcelo, Andrea Jean C.**  <br/>
-- **Vicente, Francheska Josefa** 
+- **Vicente, Francheska Josefa**
+
+## References
+United Nations Development Programme. (n.d.). *What are the Sustainable Development Goals?*. https://www.undp.org/sustainable-development-goals
