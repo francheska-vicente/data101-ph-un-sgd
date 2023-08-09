@@ -23,7 +23,7 @@ Furthermore, interactive visualizations enable policymakers to track progress ov
 2. Open the file **.mapbox_token** using the Notepad application, and paste your mapbox token. Save your changes.
 3. Launch `Jupyter Notebook` or `Jupyter Lab`.
 4. Navigate to the project folder containing **main.ipynb**. 
-5. Then, in the **Final** folder, open the **2-Geospatial_v3.ipynb**.
+5. Then, open the **2-Geospatial_v3.ipynb**.
 6. In the **2-Geospatial_v3.ipynb**, click **Restart and Run All**, this would create the geospatial files needed to run the application.
 7. Once the notebook is done executing, open your `Command Prompt` or `Terminal` and navigate it to the folder containing **app.py**.
 8. Run the dashboard using the command **python app.py**.
