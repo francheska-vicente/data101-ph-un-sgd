@@ -46,9 +46,7 @@ def generate_heatmap(region_selected):
         region_df_corr.mask(mask).dropna(how="all").dropna(axis="columns", how="all")
     )
 
-    fig = px.imshow(df_corr_viz, 
-                    text_auto=True,
-                    color_continuous_scale='PRGn')
+    fig = px.imshow(df_corr_viz, text_auto=True, color_continuous_scale="PRGn")
     fig.update_layout(
         yaxis=dict(tickfont=dict(size=7)), xaxis=dict(tickfont=dict(size=7))
     )
@@ -133,9 +131,9 @@ def generate_choropleth():
     sdg = sdg_data["Geolocation"].unique()[1:]
     sdg = pd.DataFrame({"Geolocation": sdg})
     geo = population_df
-    geo = geo [geo ['Year'] == 2020].reset_index (drop = True)
-    geo = geo [geo ['Geolocation'] != 'PHILIPPINES']
-    geo = geo.drop (['Year', 'Geolocation'], axis = 1)
+    geo = geo[geo["Year"] == 2020].reset_index(drop=True)
+    geo = geo[geo["Geolocation"] != "PHILIPPINES"]
+    geo = geo.drop(["Year", "Geolocation"], axis=1)
     updated_region_area = pd.concat([sdg, geo["Population"]], axis=1)
 
     fig = px.choropleth_mapbox(
@@ -268,6 +266,12 @@ choropleth_card = dbc.Card(
                 dcc.Loading(dcc.Graph(figure=generate_choropleth(), id="choropleth")),
                 dmc.Divider(variant="dotted", className="p-2"),
                 html.H6(
+                    [
+                        reg_choropleth_desc,
+                        html.Br(),
+                        html.Br(),
+                        reg_choropleth_tip,
+                    ],
                     className="text-center",
                     id="choropleth_desc",
                 ),
@@ -350,6 +354,7 @@ layout = dbc.Container(
     },
 )
 
+
 @callback(
     Output("target-info-accordion", "children"), Input("target-dropdown", "value")
 )
@@ -375,7 +380,6 @@ def update_accordion(targets):
     Output("heatmap", "figure"),
     Output("heatmap_title", "children"),
     Output("heatmap_desc", "children"),
-    Output("choropleth_desc", "children"),
     Output("linechart_div", "children"),
     Input("target-dropdown", "value"),
     Input("choropleth", "clickData"),
@@ -393,13 +397,6 @@ def update_charts(targets, choropleth_click):
 
     heatmap_info = [reg_heatmap_desc]
 
-    choropleth_info = [
-        reg_choropleth_desc,
-        html.Br(),
-        html.Br(),
-        reg_choropleth_tip,
-    ]
-
     linechart_info = [
         reg_linechart_desc,
         html.Br(),
@@ -414,4 +411,10 @@ def update_charts(targets, choropleth_click):
                 create_linechart_card(region, target, linechart_info)
             )
 
-    return (title, generate_heatmap(region), heatmap_title, heatmap_info, choropleth_info, linechart_cards)
+    return (
+        title,
+        generate_heatmap(region),
+        heatmap_title,
+        heatmap_info,
+        linechart_cards,
+    )
