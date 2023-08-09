@@ -5,10 +5,10 @@ sdg_data = pd.read_csv(
     "https://raw.githubusercontent.com/francheska-vicente/datapre-project/main_v2/data_output/combined_data.csv"
 )
 sdg_columns = sdg_data.columns[:-15]
+population_df = sdg_data [['Geolocation', 'Year', 'Population']]
 sdg_data = sdg_data[sdg_columns]
 
 sdg_score = pd.read_csv("data/sdg_target_score.csv")
-
 sdg_info = pd.read_csv("data/sdg_infov3.csv")
 region_info = pd.read_csv("data/region_infov1.csv")
 
