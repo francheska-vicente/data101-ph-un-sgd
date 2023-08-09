@@ -247,6 +247,7 @@ def choropleth_two_indicator (indicators_selected):
                           geojson=region.geometry,
                           locations='Geolocation',
                           color=df.columns [1],
+                          color_continuous_scale='PRGn',
                           center={'lat': 12.099, 'lon': 122.733}, 
                           zoom = 4)
     return fig
