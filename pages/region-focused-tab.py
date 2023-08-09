@@ -375,6 +375,7 @@ def update_accordion(targets):
     Output("heatmap", "figure"),
     Output("heatmap_title", "children"),
     Output("heatmap_desc", "children"),
+    Output("choropleth_desc", "children"),
     Output("linechart_div", "children"),
     Input("target-dropdown", "value"),
     Input("choropleth", "clickData"),
@@ -392,6 +393,13 @@ def update_charts(targets, choropleth_click):
 
     heatmap_info = [reg_heatmap_desc]
 
+    choropleth_info = [
+        reg_choropleth_desc,
+        html.Br(),
+        html.Br(),
+        reg_choropleth_tip,
+    ]
+
     linechart_info = [
         reg_linechart_desc,
         html.Br(),
@@ -406,4 +414,4 @@ def update_charts(targets, choropleth_click):
                 create_linechart_card(region, target, linechart_info)
             )
 
-    return (title, generate_heatmap(region), heatmap_title, heatmap_info, linechart_cards)
+    return (title, generate_heatmap(region), heatmap_title, heatmap_info, choropleth_info, linechart_cards)
