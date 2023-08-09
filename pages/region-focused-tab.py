@@ -352,18 +352,6 @@ layout = dbc.Container(
     },
 )
 
-
-@callback(
-    Output("target-dropdown", "error"),
-    Output("target-info-desc", "children"),
-    Input("target-dropdown", "value"),
-)
-def update_text(target):
-    if target == None or len(target) < 1:
-        return "Select at least one target.", "Select a target to view their details."
-    return "", ""
-
-
 @callback(
     Output("target-info-accordion", "children"), Input("target-dropdown", "value")
 )
