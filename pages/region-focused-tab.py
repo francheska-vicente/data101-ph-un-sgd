@@ -132,10 +132,10 @@ def generate_linechart(region_selected, target_selected):
 def generate_choropleth():
     sdg = sdg_data["Geolocation"].unique()[1:]
     sdg = pd.DataFrame({"Geolocation": sdg})
-    geo = pd.DataFrame(population_df[['Year', "Population"]])
-    geo = geo [geo ['Year'] == 2020]
-
-    geo = geo.drop ('Year', axis = 1)
+    geo = population_df
+    geo = geo [geo ['Year'] == 2020].reset_index (drop = True)
+    geo = geo [geo ['Geolocation'] != 'PHILIPPINES']
+    geo = geo.drop (['Year', 'Geolocation'], axis = 1)
     updated_region_area = pd.concat([sdg, geo["Population"]], axis=1)
 
     fig = px.choropleth_mapbox(
@@ -143,6 +143,7 @@ def generate_choropleth():
         geojson=region.geometry,
         locations="Geolocation",
         color="Population",
+        color_continuous_scale="Aggrnyl_r",
         center={"lat": 12.099, "lon": 122.733},
         zoom=4,
     )
