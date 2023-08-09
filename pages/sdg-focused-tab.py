@@ -7,14 +7,12 @@ import plotly.express as px
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 import os
+from dash_iconify import DashIconify
 
 from data import *
 from constants import *
 
 register_page(__name__, name="SDG-focused Tab", path="/sdg-focused-tab")
-
-barchart1_is_ascending = False
-barchart2_is_ascending = False
 
 
 def generate_linechart(regions_selected, indicator):
@@ -159,9 +157,25 @@ def generate_barchart(regions_selected, indicator, selected_year, is_ascending):
     for temp in df_visualization_curr["Geolocation"]:
         regions_list.append(temp.split(":")[0])
 
-    colors_list = ['#17becf', '#636363', '#66c85a', '#d14787', '#584477', '#a6cee3', 
-                   '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', 
-                   '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928']
+    colors_list = [
+        "#17becf",
+        "#636363",
+        "#66c85a",
+        "#d14787",
+        "#584477",
+        "#a6cee3",
+        "#1f78b4",
+        "#b2df8a",
+        "#33a02c",
+        "#fb9a99",
+        "#e31a1c",
+        "#fdbf6f",
+        "#ff7f00",
+        "#cab2d6",
+        "#6a3d9a",
+        "#ffff99",
+        "#b15928",
+    ]
 
     fig = px.bar(
         df_visualization_curr,
@@ -169,7 +183,7 @@ def generate_barchart(regions_selected, indicator, selected_year, is_ascending):
         y=regions_list,
         labels={indicator: label},
         color=regions_list,
-        color_discrete_sequence = colors_list
+        color_discrete_sequence=colors_list,
     )
 
     fig.update_layout(
@@ -224,78 +238,93 @@ def generate_barchart(regions_selected, indicator, selected_year, is_ascending):
 
 
 def generate_choropleth(indicators_selected, selected_year):
-    if len (indicators_selected) == 1:
-        fig = choropleth_one_indicator (indicators_selected, selected_year)
+    if len(indicators_selected) == 1:
+        fig = choropleth_one_indicator(indicators_selected, selected_year)
     else:
-        fig = choropleth_two_indicator (indicators_selected)
+        fig = choropleth_two_indicator(indicators_selected)
     return fig
 
-def choropleth_one_indicator (indicators_selected, selected_year):
-    choropleth_data = create_choropleth_data(indicators_selected [0], selected_year)
-    fig = px.choropleth_mapbox(choropleth_data[0],
-                          geojson=region.geometry,
-                          locations='Geolocation',
-                          color=choropleth_data[1],
-                          color_continuous_scale='Aggrnyl_r',
-                          center={'lat': 12.099, 'lon': 122.733}, 
-                          zoom = 4)
+
+def choropleth_one_indicator(indicators_selected, selected_year):
+    choropleth_data = create_choropleth_data(indicators_selected[0], selected_year)
+    fig = px.choropleth_mapbox(
+        choropleth_data[0],
+        geojson=region.geometry,
+        locations="Geolocation",
+        color=choropleth_data[1],
+        color_continuous_scale="Aggrnyl_r",
+        center={"lat": 12.099, "lon": 122.733},
+        zoom=4,
+    )
     return fig
 
-def choropleth_two_indicator (indicators_selected):
-    df = create_choropleth_df (indicators_selected)
-    fig = px.choropleth_mapbox(df,
-                          geojson=region.geometry,
-                          locations='Geolocation',
-                          color=df.columns [1],
-                          color_continuous_scale='PRGn',
-                          center={'lat': 12.099, 'lon': 122.733}, 
-                          zoom = 4)
+
+def choropleth_two_indicator(indicators_selected):
+    df = create_choropleth_df(indicators_selected)
+    fig = px.choropleth_mapbox(
+        df,
+        geojson=region.geometry,
+        locations="Geolocation",
+        color=df.columns[1],
+        color_continuous_scale="PRGn",
+        center={"lat": 12.099, "lon": 122.733},
+        zoom=4,
+    )
     return fig
+
 
 def create_choropleth_data(selected_indicator, selected_year):
     # check if a csv file for this indicator already exists
-    check_file = os.path.isfile(selected_indicator+'.csv')
-    
+    check_file = os.path.isfile(selected_indicator + ".csv")
+
     # if csv file does not exist
     if check_file == False:
-        gdf = gdf_shp[['geometry', 'Geolocation', 'Year', selected_indicator]]
-        pvt_gdf = pd.pivot_table(gdf, index='Geolocation', columns='Year', values=selected_indicator).reset_index()
-        pvt_gdf.to_csv('./data/indicator_csv/'+selected_indicator+'.csv', index = False)
-    
-    pvt_gdf = pd.read_csv('./data/indicator_csv/'+selected_indicator+'.csv')
-    
-    # Checking if there is year data based on the selected year and selected indicator 
-    year_list = pvt_gdf.columns [1:]
-        
+        gdf = gdf_shp[["geometry", "Geolocation", "Year", selected_indicator]]
+        pvt_gdf = pd.pivot_table(
+            gdf, index="Geolocation", columns="Year", values=selected_indicator
+        ).reset_index()
+        pvt_gdf.to_csv(
+            "./data/indicator_csv/" + selected_indicator + ".csv", index=False
+        )
+
+    pvt_gdf = pd.read_csv("./data/indicator_csv/" + selected_indicator + ".csv")
+
+    # Checking if there is year data based on the selected year and selected indicator
+    year_list = pvt_gdf.columns[1:]
+
     if selected_year == None:
-        selected_year = year_list [-1]
-    pvt_gdf = pvt_gdf[['Geolocation',  selected_year]]
-    print('\n[SDG Indicator] ' + selected_indicator)
-    print('[Year Data] ' + selected_year)
+        selected_year = year_list[-1]
+    pvt_gdf = pvt_gdf[["Geolocation", selected_year]]
+    print("\n[SDG Indicator] " + selected_indicator)
+    print("[Year Data] " + selected_year)
     return pvt_gdf, str(selected_year)
 
-def create_choropleth_df (indicators_selected):
-    ind_1 = pd.read_csv('./data/indicator_csv/'+indicators_selected[0]+'.csv')
+
+def create_choropleth_df(indicators_selected):
+    ind_1 = pd.read_csv("./data/indicator_csv/" + indicators_selected[0] + ".csv")
     ind_1_T = ind_1.T
-    ind_2 = pd.read_csv('./data/indicator_csv/'+indicators_selected[1]+'.csv')
+    ind_2 = pd.read_csv("./data/indicator_csv/" + indicators_selected[1] + ".csv")
     ind_2_T = ind_2.T
     df = pd.DataFrame([])
-    for i in range(17): 
+    for i in range(17):
         j = 1
         print(i)
         data_regional_1 = ind_1_T[i]
         data_regional_2 = ind_2_T[i]
-    
+
         if i == 3:
             j = 3
         x = np.array(data_regional_1[j:])
         y = np.array(data_regional_2[j:])
-    
+
         r, p = scipy.stats.pearsonr(x, y)
-        temp_df = pd.DataFrame ({'Geolocation': data_regional_1[0], 'Correlation': r}, index = [0])
-        df = pd.concat ([df, temp_df])
+        temp_df = pd.DataFrame(
+            {"Geolocation": data_regional_1[0], "Correlation": r}, index=[0]
+        )
+        df = pd.concat([df, temp_df])
 
     return df
+
 
 def get_latest_year(indicator):
     temp_region = sdg_data[["Geolocation", "Year", indicator]]
@@ -485,16 +514,35 @@ choropleth_card = dbc.Card(
             children=[
                 dcc.Loading(dcc.Graph(figure=px.choropleth(), id="choropleth")),
                 dmc.Divider(variant="dotted", className="p-2"),
-                html.H6(
-                    sdg_linechart_desc_default,
-                    className="text-center",
-                    id="choropleth_desc",
+                html.Div(
+                    [
+                        html.Div(
+                            dmc.Tooltip(
+                                dmc.ActionIcon(
+                                    DashIconify(icon="ph:question", width=20),
+                                    size="lg",
+                                    variant="filled",
+                                    id="choropleth_infobtn",
+                                    n_clicks=0,
+                                    mb=10,
+                                ),
+                                label="More Info",
+                            ),
+                            className="d-flex flex-row justify-content-end align-items-end",
+                        ),
+                        html.H6(
+                            sdg_linechart_desc_default,
+                            className="text-center",
+                            id="choropleth_desc",
+                            style={"display": "none"},
+                        ),
+                    ]
                 ),
             ],
             className="w-100",
         ),
     ],
-    className="mt-3 flex justify-content-center align-items-center",
+    className="mt-3",
 )
 
 linechart1_card = dbc.Card(
@@ -504,16 +552,35 @@ linechart1_card = dbc.Card(
             children=[
                 dcc.Loading(dcc.Graph(figure=px.line(), id="linechart1")),
                 dmc.Divider(variant="dotted", className="p-2"),
-                html.H6(
-                    sdg_linechart_desc_default,
-                    className="text-center",
-                    id="linechart1_desc",
+                html.Div(
+                    [
+                        html.Div(
+                            dmc.Tooltip(
+                                dmc.ActionIcon(
+                                    DashIconify(icon="ph:question", width=20),
+                                    size="lg",
+                                    variant="filled",
+                                    id="linechart1_infobtn",
+                                    n_clicks=0,
+                                    mb=10,
+                                ),
+                                label="More Info",
+                            ),
+                            className="d-flex flex-row justify-content-end align-items-end",
+                        ),
+                        html.H6(
+                            sdg_linechart_desc_default,
+                            className="text-center",
+                            id="linechart1_desc",
+                            style={"display": "none"},
+                        ),
+                    ]
                 ),
             ],
             className="w-100",
         ),
     ],
-    className="mt-3 flex justify-content-center align-items-center",
+    className="mt-3",
 )
 
 linechart2_card = dbc.Card(
@@ -523,16 +590,36 @@ linechart2_card = dbc.Card(
             children=[
                 dcc.Loading(dcc.Graph(figure=px.line(), id="linechart2")),
                 dmc.Divider(variant="dotted", className="p-2"),
-                html.H6(
-                    sdg_linechart_desc_default,
-                    className="text-center",
-                    id="linechart2_desc",
+                html.Div(
+                    [
+                        html.Div(
+                            dmc.Tooltip(
+                                dmc.ActionIcon(
+                                    DashIconify(icon="ph:question", width=20),
+                                    size="lg",
+                                    variant="filled",
+                                    id="linechart2_infobtn",
+                                    n_clicks=0,
+                                    mb=10,
+                                ),
+                                label="More Info",
+                            ),
+                            className="d-flex flex-row justify-content-end align-items-end",
+                        ),
+                        html.H6(
+                            sdg_linechart_desc_default,
+                            className="text-center",
+                            id="linechart2_desc",
+                            style={"display": "none"},
+                        ),
+                    ],
+                    className="d-flex flex-column",
                 ),
             ],
             className="w-100",
         ),
     ],
-    className="hidden mt-3 flex justify-content-center align-items-center",
+    className="hidden mt-3",
     id="linechart2_card",
 )
 
@@ -543,16 +630,52 @@ barchart1_card = dbc.Card(
             children=[
                 dcc.Loading(dcc.Graph(figure=px.bar(), id="barchart1")),
                 dmc.Divider(variant="dotted", className="p-2"),
-                html.H6(
-                    sdg_barchart_desc_default,
-                    className="text-center",
-                    id="barchart1_desc",
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                dmc.Tooltip(
+                                    dmc.ActionIcon(
+                                        DashIconify(
+                                            icon="ph:arrows-down-up-bold", width=20
+                                        ),
+                                        size="lg",
+                                        variant="filled",
+                                        id="barchart1_sortbtn",
+                                        n_clicks=0,
+                                        mb=10,
+                                    ),
+                                    label="Toggle Sort",
+                                    className="me-3",
+                                ),
+                                dmc.Tooltip(
+                                    dmc.ActionIcon(
+                                        DashIconify(icon="ph:question", width=20),
+                                        size="lg",
+                                        variant="filled",
+                                        id="barchart1_infobtn",
+                                        n_clicks=0,
+                                        mb=10,
+                                    ),
+                                    label="More Info",
+                                ),
+                            ],
+                            className="d-flex flex-row justify-content-end align-items-end",
+                        ),
+                        html.H6(
+                            sdg_linechart_desc_default,
+                            className="text-center",
+                            id="barchart1_desc",
+                            style={"display": "none"},
+                        ),
+                    ],
+                    className="d-flex flex-column",
                 ),
             ],
             className="w-100",
         ),
     ],
-    className="mt-3 flex justify-content-center align-items-center",
+    className="mt-3",
 )
 
 barchart2_card = dbc.Card(
@@ -562,16 +685,52 @@ barchart2_card = dbc.Card(
             children=[
                 dcc.Loading(dcc.Graph(figure=px.bar(), id="barchart2")),
                 dmc.Divider(variant="dotted", className="p-2"),
-                html.H6(
-                    sdg_barchart_desc_default,
-                    className="text-center",
-                    id="barchart2_desc",
+                html.Div(
+                    [
+                        html.Div(
+                            [
+                                dmc.Tooltip(
+                                    dmc.ActionIcon(
+                                        DashIconify(
+                                            icon="ph:arrows-down-up-bold", width=20
+                                        ),
+                                        size="lg",
+                                        variant="filled",
+                                        id="barchart2_sortbtn",
+                                        n_clicks=0,
+                                        mb=10,
+                                    ),
+                                    label="Toggle Sort",
+                                    className="me-3",
+                                ),
+                                dmc.Tooltip(
+                                    dmc.ActionIcon(
+                                        DashIconify(icon="ph:question", width=20),
+                                        size="lg",
+                                        variant="filled",
+                                        id="barchart2_infobtn",
+                                        n_clicks=0,
+                                        mb=10,
+                                    ),
+                                    label="More Info",
+                                ),
+                            ],
+                            className="d-flex flex-row justify-content-end align-items-end",
+                        ),
+                        html.H6(
+                            sdg_linechart_desc_default,
+                            className="text-center",
+                            id="barchart2_desc",
+                            style={"display": "none"},
+                        ),
+                    ],
+                    className="d-flex flex-column",
                 ),
             ],
             className="w-100",
         ),
     ],
-    className="mt-3 flex justify-content-center align-items-center",
+    className="hidden mt-3",
     id="barchart2_card",
 )
 
@@ -652,6 +811,40 @@ def update_accordion(regions):
     return children
 
 
+@callback(Output("choropleth_desc", "style"), Input("choropleth_infobtn", "n_clicks"))
+def toggle_info(clicks):
+    if clicks % 2 == 0:
+        return {"display": "none"}
+    return {"display": "block"}
+
+
+@callback(Output("linechart1_desc", "style"), Input("linechart1_infobtn", "n_clicks"))
+def toggle_info(clicks):
+    if clicks % 2 == 0:
+        return {"display": "none"}
+    return {"display": "block"}
+
+
+@callback(Output("linechart2_desc", "style"), Input("linechart2_infobtn", "n_clicks"))
+def toggle_info(clicks):
+    if clicks % 2 == 0:
+        return {"display": "none"}
+    return {"display": "block"}
+
+
+@callback(Output("barchart1_desc", "style"), Input("barchart1_infobtn", "n_clicks"))
+def toggle_info(clicks):
+    if clicks % 2 == 0:
+        return {"display": "none"}
+    return {"display": "block"}
+
+
+@callback(Output("barchart2_desc", "style"), Input("barchart2_infobtn", "n_clicks"))
+def toggle_info(clicks):
+    if clicks % 2 == 0:
+        return {"display": "none"}
+    return {"display": "block"}
+
 @callback(
     Output("indicator-info-accordion", "children"), Input("indicator-dropdown", "value")
 )
@@ -693,28 +886,30 @@ def update_accordion(indicators):
     Input("indicator-dropdown", "value"),
     Input("linechart1", "clickData"),
     Input("linechart2", "clickData"),
-    Input("barchart1", "clickData"),
-    Input("barchart2", "clickData"),
+    Input("barchart1_sortbtn", "n_clicks"),
+    Input("barchart2_sortbtn", "n_clicks")
 )
 def update_charts(
     regions,
     indicators,
     linechart1_click,
     linechart2_click,
-    barchart1_click,
-    barchart2_click,
+    barchart1_sortbtn,
+    barchart2_sortbtn
 ):
-    global barchart1_is_ascending, barchart2_is_ascending
     year = None
     if linechart1_click != None:
         year = linechart1_click["points"][0]["x"]
     if linechart2_click != None:
         year = linechart2_click["points"][0]["x"]
 
-    if callback_context.triggered[0]["prop_id"] == "barchart1.clickData":
-        barchart1_is_ascending = not barchart1_is_ascending
-    elif callback_context.triggered[0]["prop_id"] == "barchart2.clickData":
-        barchart2_is_ascending = not barchart2_is_ascending
+    barchart1_is_ascending = False
+    barchart2_is_ascending = False
+
+    if callback_context.triggered[0]["prop_id"] == "barchart1_sortbtn.n_clicks" and barchart1_sortbtn % 2 == 1:
+        barchart1_is_ascending = True
+    elif callback_context.triggered[0]["prop_id"] == "barchart2_infobtn.n_clicks" and barchart2_sortbtn % 2 == 1:
+        barchart2_is_ascending = True
 
     if regions == None:
         regions = []
@@ -733,9 +928,7 @@ def update_charts(
         sdg_barchart_tip,
     ]
 
-    choropleth1_info = [
-        sdg_choropleth_desc1
-    ]
+    choropleth1_info = [sdg_choropleth_desc1]
 
     choropleth2_info = [
         sdg_choropleth_desc2,
