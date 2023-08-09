@@ -354,6 +354,14 @@ def get_latest_year(indicator):
     year_values = temp_region["Year"].unique()
     return year_values[-1]
 
+def is_year_valid (selected_indicator, selected_year):
+    if selected_year == None:
+        return False
+    temp_df = sdg_data[["Year", selected_indicator]]
+    temp_df = temp_df [temp_df ["Year"] == selected_year].dropna ()
+    if len (temp_df) == 0:
+        return False
+    return True
 
 control_card = dbc.Card(
     children=[
@@ -954,7 +962,7 @@ def update_charts(
             "Bar Chart of the "
             + " ".join(indicators[0].split(" ")[1:])
             + " of the Year "
-            + (str(get_latest_year(indicators[0])) if year == None else year),
+            + (str(get_latest_year(indicators[0])) if year == None or not is_year_valid(indicators[0], year) else year),
             linechart_info,
             barchart_info,
             px.line(),
@@ -976,7 +984,7 @@ def update_charts(
             "Bar Chart of the "
             + " ".join(indicators[0].split(" ")[1:])
             + " of the Year "
-            + (str(get_latest_year(indicators[0])) if year == None else year),
+            + (str(get_latest_year(indicators[0])) if not is_year_valid(indicators[0], year) else year),
             linechart_info,
             barchart_info,
             generate_linechart(regions, [indicators[1]]),
@@ -985,7 +993,7 @@ def update_charts(
             "Bar Chart of the "
             + " ".join(indicators[1].split(" ")[1:])
             + " of the Year "
-            + (str(get_latest_year(indicators[1])) if year == None else year),
+            + (str(get_latest_year(indicators[1])) if not is_year_valid(indicators[1], year) else year),
             linechart_info,
             barchart_info,
             {"display": "block"},
