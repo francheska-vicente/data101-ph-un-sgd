@@ -765,18 +765,6 @@ layout = dbc.Container(
     },
 )
 
-
-@callback(
-    Output("region-dropdown", "error"),
-    Output("region-info-desc", "children"),
-    Input("region-dropdown", "value"),
-)
-def update_text(region):
-    if region == None or len(region) < 1:
-        return "Select at least one region.", "Select a region to view their details."
-    return "", ""
-
-
 @callback(
     Output("indicator-dropdown", "error"),
     Output("indicator-info-desc", "children"),
