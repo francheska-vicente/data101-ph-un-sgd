@@ -20,11 +20,13 @@ Furthermore, interactive visualizations enable policymakers to track progress ov
 
 ## How to set up and run the project locally
 1. Extract the folder from the zipped file that you can download through this DownGit [link](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/francheska-vicente/data101-ph-un-sgd/tree/main).
-2. Launch `Jupyter Notebook` or `Jupyter Lab`.
-3. Navigate to the project folder containing **main.ipynb**. Then, in the **Final** folder, open the **2-Geospatial_v3.ipynb**.
-4. In the **2-Geospatial_v3.ipynb**, click **Restart and Run All**, this would create the geospatial files needed to run the application.
-5. Once the notebook is done executing, open your `Command Prompt` or `Terminal` and navigate it to the folder containing **app.py**.
-6. Run the dashboard using the command **python app.py**.
+2. Open the file **.mapbox_token**, and paste your mapbox token.
+3. Launch `Jupyter Notebook` or `Jupyter Lab`.
+4. Navigate to the project folder containing **main.ipynb**. Then, in the **Final** folder, open the **2-Geospatial_v3.ipynb**.
+5. In the **2-Geospatial_v3.ipynb**, click **Restart and Run All**, this would create the geospatial files needed to run the application.
+6. Once the notebook is done executing, open your `Command Prompt` or `Terminal` and navigate it to the folder containing **app.py**.
+7. Run the dashboard using the command **python app.py**.
+8. Wait for the dashboard to complete initialization. Once done, on your browser, go to `http://127.0.0.1:8080/`.
 
 ## Authors
 - **Demafelix, Christienne Angelo D.**  <br/>
