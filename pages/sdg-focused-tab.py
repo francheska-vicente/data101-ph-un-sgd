@@ -305,6 +305,17 @@ def create_choropleth_df(indicators_selected):
     ind_1_T = ind_1.T
     ind_2 = pd.read_csv("./data/indicator_csv/" + indicators_selected[1] + ".csv")
     ind_2_T = ind_2.T
+
+    years = list (ind_1_T.index) [1 : ]
+
+    if len (years) > len (list (ind_2_T.index)) - 1:
+        years = list (ind_2_T.index) [1 : ]
+        years.insert (0, 'Geolocation')
+        ind_1_T = ind_1_T.loc[years]
+    else:
+        years.insert (0, 'Geolocation')
+        ind_2_T = ind_2_T.loc[years]
+
     df = pd.DataFrame([])
     for i in range(17):
         j = 1
@@ -314,8 +325,8 @@ def create_choropleth_df(indicators_selected):
 
         if i == 3:
             j = 3
-        x = np.array(data_regional_1[j:])
-        y = np.array(data_regional_2[j:])
+        x = np.array(data_regional_1[1:].dropna())
+        y = np.array(data_regional_2[1:].dropna())
 
         r, p = scipy.stats.pearsonr(x, y)
         temp_df = pd.DataFrame(
