@@ -16,7 +16,7 @@ sdg_choropleth_tip2 = "Click on a region to see the information for that specifi
 reg_linechart_desc = "This line chart allows you to see the trend of all of the indicators under a specific target and determine which indicators would need to be improved. "
 reg_linechart_tip = "Click on a data point to see the information for that specific year on the choropleth map."
 reg_heatmap_desc = "This heat map illustrates how different targets of the SDG are related to each other. It indicates whether the two targets are moving in the same direction (positive value) or in opposite directions (negative value) based on the data available."
-reg_choropleth_desc = "This choropleth map shows the area (in km^2) of each of the regions."
+reg_choropleth_desc = "This choropleth map shows the population of each of the regions."
 reg_choropleth_tip = "Click on a region to see the information for that specific region on the line charts."
 
 blank_chart = {
