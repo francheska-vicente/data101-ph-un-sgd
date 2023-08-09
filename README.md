@@ -20,7 +20,7 @@ Furthermore, interactive visualizations enable policymakers to track progress ov
 
 ## How to set up and run the project locally
 1. In your File Explorer, navigate to the project folder containing **main.ipynb**. 
-2. Open the file **.mapbox_token** using a Notepad, and paste your mapbox token. Save your changes.
+2. Open the file **.mapbox_token** using the Notepad application, and paste your mapbox token. Save your changes.
 3. Launch `Jupyter Notebook` or `Jupyter Lab`.
 4. Navigate to the project folder containing **main.ipynb**. 
 5. Then, in the **Final** folder, open the **2-Geospatial_v3.ipynb**.
