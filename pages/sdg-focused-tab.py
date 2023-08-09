@@ -147,9 +147,17 @@ def generate_barchart(regions_selected, indicator, selected_year, is_ascending):
     if selected_year == None:
         selected_year = year_values[-1]
 
-    df_visualization_curr = df_visualization[
+    temp_df_visualization_curr = df_visualization[
         df_visualization["Year"] == int(selected_year)
     ]
+
+    if len (temp_df_visualization_curr) == 0:
+        selected_year = year_values[-1]
+        df_visualization_curr = df_visualization[
+            df_visualization["Year"] == int(selected_year)
+        ]
+    else:
+        df_visualization_curr = temp_df_visualization_curr
 
     df_visualization_curr = df_visualization_curr.drop_duplicates()
     regions_list = []
